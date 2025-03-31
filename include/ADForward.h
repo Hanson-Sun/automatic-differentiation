@@ -5,14 +5,15 @@
 
 
 namespace AD {
+class Parameter;
 
 class Expression {
  public:
-    virtual ~Expression() {}
+    Expression() : value(0), derivative(0) {}
+    virtual ~Expression();
     virtual void evaluate() = 0;
     virtual void backwards(double resid) = 0;
     virtual void forwards(Parameter* param) = 0;
-    // virtual std::function<double> lambda() = 0;
     double value;
     double derivative;
 };
@@ -37,7 +38,7 @@ class Constant : public Expression {
 
 class Parameter : public Expression {
  public:
-    Parameter(double value) : {
+    Parameter(double value) {
         this->value = value;
     }
 
@@ -215,11 +216,115 @@ class Log : public Expression {
     Expression* a;
 };
 
+class Exp : public Expression {
+ public:
+    Exp(Expression* a) : a(a) {}
 
-std::vector<double> differentiate(std::function<Expression*()> f, const std::vector<double>& x) {
-    // idk what actually goes here
-    return std::vector<double>();
+    void evaluate() override {
+        a->evaluate();
+        this->value = std::exp(a->value);
+    }
+
+    void backwards(double resid) override {
+        a->backwards(resid * std::exp(a->value));
+    }
+
+    void forwards(Parameter* param) override {
+        a->forwards(param);
+        this->value = std::exp(a->value);
+        this->derivative = a->derivative * std::exp(a->value);
+    }
+ private:
+    Expression* a;
+};
+
+class Sin : public Expression {
+ public:
+    Sin(Expression* a) : a(a) {}
+
+    void evaluate() override {
+        a->evaluate();
+        this->value = std::sin(a->value);
+    }
+
+    void backwards(double resid) override {
+        a->backwards(resid * std::cos(a->value));
+    }
+
+    void forwards(Parameter* param) override {
+        a->forwards(param);
+        this->value = std::sin(a->value);
+        this->derivative = a->derivative * std::cos(a->value);
+    }
+
+ private:
+    Expression* a;
+};
+
+
+class Cos : public Expression {
+ public:
+    Cos(Expression* a) : a(a) {}
+
+    void evaluate() override {
+        a->evaluate();
+        this->value = std::cos(a->value);
+    }
+
+    void backwards(double resid) override {
+        a->backwards(-1 * resid * std::sin(a->value));
+    }
+
+    void forwards(Parameter* param) override {
+        a->forwards(param);
+        this->value = std::cos(a->value);
+        this->derivative = -1 * a->derivative * std::sin(a->value);
+    }
+
+ private:
+    Expression* a;
+};
+
+class Tan : public Expression {
+ public:
+    Tan(Expression* a) : a(a) {}
+
+    void evaluate() override {
+        a->evaluate();
+        this->value = std::tan(a->value);
+    }
+
+    void backwards(double resid) override {
+        a->backwards(resid / (std::cos(a->value) * std::cos(a->value)));
+    }
+
+    void forwards(Parameter* param) override {
+        a->forwards(param);
+        this->value = std::tan(a->value);
+        this->derivative = a->derivative / (std::cos(a->value) * std::cos(a->value));
+    }
+
+ private:
+    Expression* a;
+};
+
+inline Expression* operator+(Expression& a, Expression& b) {
+    return new Add(&a, &b);
 }
+
+inline Expression* operator*(Expression& a, Expression& b) {
+    return new Mult(&a, &b);
+}
+
+inline Expression* operator-(Expression& a, Expression& b) {
+    return new Sub(&a, &b);
+}
+
+inline Expression* operator/(Expression& a, Expression& b) {
+    return new Div(&a, &b);
+}
+
+
 
 };  // namespace AD
 

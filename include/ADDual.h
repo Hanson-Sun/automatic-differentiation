@@ -34,93 +34,93 @@ Dual<T> operator+(const Dual<T>& a, const Dual<T>& b) {
 }
 
 template<typename T = double>
-Dual<T> operator+=(Dual<T>& a, const Dual<T>& b) {
+inline Dual<T> operator+=(Dual<T>& a, const Dual<T>& b) {
     a.real += b.real;
     a.dual += b.dual;
     return a;
 }
 
 template<typename T = double>
-Dual<T> operator-(const Dual<T>& a, const Dual<T>& b) {
+inline Dual<T> operator-(const Dual<T>& a, const Dual<T>& b) {
     return {a.real - b.real, a.dual - b.dual};
 }
 
 template<typename T = double>
-Dual<T> operator-=(Dual<T>& a, const Dual<T>& b) {
+inline Dual<T> operator-=(Dual<T>& a, const Dual<T>& b) {
     a.real -= b.real;
     a.dual -= b.dual;
     return a;
 }
 
 template<typename T = double>
-Dual<T> operator*(const Dual<T>& a, const Dual<T>& b) {
+inline Dual<T> operator*(const Dual<T>& a, const Dual<T>& b) {
     return {a.real * b.real, a.real * b.dual + a.dual * b.real};
 }
 
 template<typename T = double>
-Dual<T> operator*=(Dual<T>& a, const Dual<T>& b) {
+inline Dual<T> operator*=(Dual<T>& a, const Dual<T>& b) {
     a.real *= b.real;
     a.dual = a.real * b.dual + a.dual * b.real;
     return a;
 }
 
 template<typename T = double>
-Dual<T> operator/(const Dual<T>& a, const Dual<T>& b) {
+inline Dual<T> operator/(const Dual<T>& a, const Dual<T>& b) {
     return {a.real / b.real, (a.dual * b.real - a.real * b.dual) / (b.real * b.real)};
 }
 
 template<typename T = double>
-Dual<T> operator/=(Dual<T>& a, const Dual<T>& b) {
+inline Dual<T> operator/=(Dual<T>& a, const Dual<T>& b) {
     a.real /= b.real;
     a.dual = (a.dual * b.real - a.real * b.dual) / (b.real * b.real);
     return a;
 }
 
 template<typename T = double, T(*logFunc)(T) = std::log>
-Dual<T> log(const Dual<T>& a) {
+inline Dual<T> log(const Dual<T>& a) {
     return {logFunc(a.real), a.dual / a.real};
 }
 
 template<typename T = double, T(*expFunc)(T) = std::exp>
-Dual<T> exp(const Dual<T>& a) {
+inline Dual<T> exp(const Dual<T>& a) {
     double e = expFunc(a.real);
     return {e, a.dual * e};
 }
 
 template<typename T = double, T(*logFunc)(T) = std::exp, T(*powFunc)(T, T) = std::pow>
-Dual<T> pow(const Dual<T>& a, const Dual<T>& b) {
+inline Dual<T> pow(const Dual<T>& a, const Dual<T>& b) {
     double p = powFunc(a.real, b.real);
     return {p, p * (b.dual * logFunc(a.real) + b.real * a.dual / a.real)};
 }
 
 template<typename T = double, T(*sinFunc)(T) = std::sin, T(*cosFunc)(T) = std::cos>
-Dual<T> sin(const Dual<T>& a) {
+inline Dual<T> sin(const Dual<T>& a) {
     return {sinFunc(a.real), a.dual * cosFunc(a.real)};
 }
 
 template<typename T = double, T(*sinFunc)(T) = std::sin, T(*cosFunc)(T) = std::cos>
-Dual<T> cos(const Dual<T>& a) {
+inline Dual<T> cos(const Dual<T>& a) {
     return {cosFunc(a.real), -a.dual * sinFunc(a.real)};
 }
 
 template<typename T = double, T(*tanFunc)(T) = std::tan, T(*cosFunc)(T) = std::cos>
-Dual<T> tan(const Dual<T>& a) {
+inline Dual<T> tan(const Dual<T>& a) {
     double t = tanFunc(a.real);
     return {t, a.dual / (cosFunc(a.real) * cosFunc(a.real))};
 }
 
 template<typename T = double, T(*asinFunc)(T) = std::asin, T(*sqrtFunc)(T) = std::sqrt>
-Dual<T> asin(const Dual<T>& a) {
+inline Dual<T> asin(const Dual<T>& a) {
     return {asinFunc(a.real), a.dual / sqrtFunc(1 - a.real * a.real)};
 }
 
 template<typename T = double, T(*acosFunc)(T) = std::acos, T(*sqrtFunc)(T) = std::sqrt>
-Dual<T> acos(const Dual<T>& a) {
+inline Dual<T> acos(const Dual<T>& a) {
     return {acosFunc(a.real), -a.dual / sqrtFunc(1 - a.real * a.real)};
 }
 
 template<typename T = double, T(*atanFunc)(T) = std::atan>
-Dual<T> atan(const Dual<T>& a) {
+inline Dual<T> atan(const Dual<T>& a) {
     return {atanFunc(a.real), a.dual / (1 + a.real * a.real)};
 }
 
