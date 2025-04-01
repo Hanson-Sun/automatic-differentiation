@@ -57,6 +57,10 @@ I mean its not that different compared to forward mode.
 
 **we start from the output**
 
+## Expression Templates
+
+Generate the expression in compile time using C++ templates!
+
 
 ## Performance?
 
